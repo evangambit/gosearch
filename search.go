@@ -3,7 +3,7 @@ package search
 import (
   "log"
   "database/sql"
-  _ "github.com/mattn/go-sqlite3"
+  "github.com/mattn/go-sqlite3"
 )
 
 var kFetchSize int = 10
