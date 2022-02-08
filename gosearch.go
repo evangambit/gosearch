@@ -12,6 +12,7 @@ type TokenIterator struct {
   DocIds []int
   Offset int
   Delta int
+  Negated bool
   Db *sql.DB
 }
 
@@ -79,16 +80,36 @@ func min_array(array []int) int {
 
 
 func fetch(self *TokenIterator, n int) {
-  rows, err := self.Db.Query(`
-    SELECT docid
-    FROM doctags
-    WHERE tagid = ?
-    LIMIT ?
-    OFFSET ?`,
-    self.TagId,
-    n,
-    self.Offset + len(self.DocIds),
-  )
+  //  where a.tagid = 1 and b.tagid = 2;
+  var rows int;
+  var err error;
+  if self.Negated {
+    rows, err = self.Db.Query(`
+      SELECT a.docid
+      FROM doctags as a
+      INNER JOIN doctags as b
+      ON a.docid = b.docid
+      WHERE a.docid == b.docid
+        AND a.tagid = 1
+        AND b.tagid = ?
+      LIMIT ?
+      OFFSET ?`,
+      self.TagId,
+      n,
+      self.Offset + len(self.DocIds),
+    )
+  } else {
+    rows, err = self.Db.Query(`
+      SELECT docid
+      FROM doctags
+      WHERE tagid = ?
+      LIMIT ?
+      OFFSET ?`,
+      self.TagId,
+      n,
+      self.Offset + len(self.DocIds),
+    )
+  }
   if err != nil {
     log.Fatal(err)
   }
@@ -110,16 +131,18 @@ func next(self *TokenIterator) int {
   return self.DocIds[self.Delta]
 }
 
-func Search(db *sql.DB, tagIds []int, offsets []int, k int, limit int) SearchResults {
+func Search(db *sql.DB, tagIds []int, negateds []bool, offsets []int, k int, limit int) SearchResults {
   // log.Printf("offsets = ", offsets)
   iters := []TokenIterator{}
   for i, tagId := range tagIds {
-    ti := TokenIterator{}
-    ti.TagId = tagId
-    ti.DocIds = nil
-    ti.Offset = offsets[i]
-    ti.Delta = 0
-    ti.Db = db
+    ti := TokenIterator{
+      tagId
+      nil
+      offsets[i]
+      0
+      negateds[i]
+      &db
+    }
     fetch(&ti, kFetchSize)
     ti.Delta = -1
     iters = append(iters, ti)

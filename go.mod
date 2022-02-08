@@ -1,3 +1,3 @@
-module github.com/evangambit/gosearch
+module gosearch.go
 
 go 1.17
