@@ -3,6 +3,7 @@ package search
 import (
   "log"
   "database/sql"
+  _ "github.com/mattn/go-sqlite3"
 )
 
 var kFetchSize int = 10
@@ -84,13 +85,14 @@ func fetch(self *TokenIterator, n int) {
   var err error;
   if self.Negated {
     rows, err = self.Db.Query(`
-      SELECT a.docid
-      FROM doctags as a
-      INNER JOIN doctags as b
-      ON a.docid = b.docid
-      WHERE a.docid == b.docid
-        AND a.tagid = 0
-        AND b.tagid != ?
+      select DISTINCT docid
+      from doctags
+      where docid not in 
+      (
+        select docid
+        from doctags
+        where tagid = ?
+      )
       LIMIT ?
       OFFSET ?`,
       self.TagId,
