@@ -80,8 +80,7 @@ func min_array(array []int) int {
 
 
 func fetch(self *TokenIterator, n int) {
-  //  where a.tagid = 1 and b.tagid = 2;
-  var rows int;
+  var rows *sql.Rows;
   var err error;
   if self.Negated {
     rows, err = self.Db.Query(`
@@ -136,12 +135,12 @@ func Search(db *sql.DB, tagIds []int, negateds []bool, offsets []int, k int, lim
   iters := []TokenIterator{}
   for i, tagId := range tagIds {
     ti := TokenIterator{
-      tagId
-      nil
-      offsets[i]
-      0
-      negateds[i]
-      &db
+      tagId,
+      nil,
+      offsets[i],
+      0,
+      negateds[i],
+      db,
     }
     fetch(&ti, kFetchSize)
     ti.Delta = -1
