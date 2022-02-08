@@ -89,8 +89,8 @@ func fetch(self *TokenIterator, n int) {
       INNER JOIN doctags as b
       ON a.docid = b.docid
       WHERE a.docid == b.docid
-        AND a.tagid = 1
-        AND b.tagid = ?
+        AND a.tagid = 0
+        AND b.tagid != ?
       LIMIT ?
       OFFSET ?`,
       self.TagId,
