@@ -34,15 +34,15 @@ func AtLeast(iters []TokenIterator, k int, limit int) []int {
   }
 
   for {
-    minval := min_array(vals)
-    if minval == kLastDocid {
+    maxval := max_array(vals)
+    if maxval == kLastDocid {
       return results
     }
-    if num_equal(vals, minval) >= k {
-      results = append(results, minval)
+    if num_equal(vals, maxval) >= k {
+      results = append(results, maxval)
     }
     for i, v := range vals {
-      if v == minval {
+      if v == maxval {
         vals[i] = next(&iters[i])
       }
     }
@@ -64,17 +64,17 @@ func num_equal(array []int, value int) int {
   return r
 }
 
-func min(a int, b int) int {
-    if a < b {
+func max(a int, b int) int {
+    if a > b {
         return a
     }
     return b
 }
 
-func min_array(array []int) int {
+func max_array(array []int) int {
   r := array[0]
   for _, val := range array {
-    r = min(r, val)
+    r = max(r, val)
   }
   return r
 }
