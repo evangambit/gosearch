@@ -93,6 +93,7 @@ func fetch(self *TokenIterator, n int) {
         from doctags
         where tagid = ?
       )
+      ORDER BY docid DESC
       LIMIT ?
       OFFSET ?`,
       self.TagId,
@@ -104,6 +105,7 @@ func fetch(self *TokenIterator, n int) {
       SELECT docid
       FROM doctags
       WHERE tagid = ?
+      ORDER BY docid DESC
       LIMIT ?
       OFFSET ?`,
       self.TagId,
